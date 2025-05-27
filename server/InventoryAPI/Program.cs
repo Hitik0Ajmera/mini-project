@@ -1,28 +1,23 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-// Make sure to add the namespace where InventoryDbContext is defined, for example:
 using InventoryAPI.Data;
 using InventoryAPI.Services;
-using Microsoft.OpenApi.Models; // Add this for Swagger
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-// ✅ Add services BEFORE Build
-builder.Services.AddSignalR();
-builder.Services.AddScoped<JwtService>();
-// builder.Services.AddDbContext<InventoryDbContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-// );
+
+// Add services to the container.
+builder.Services.AddControllers();
+
+// Add DbContext
+// Replace 'InventoryDbContext' with your actual DbContext class name if different
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<InventoryDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
+    options.UseSqlServer(connectionString, sqlOptions =>
+        sqlOptions.EnableRetryOnFailure()));
 
-// Add Swagger services
-builder.Services.AddEndpointsApiExplorer();
-
+// Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -36,14 +31,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Add JwtService
+builder.Services.AddScoped<JwtService>();
+
+// Add Authorization
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+
+// Add Logging
+builder.Services.AddLogging(logging =>
+{
+    logging.AddConsole();
+    logging.AddDebug();
+});
 
 var app = builder.Build();
-app.UseDefaultFiles();
-app.UseStaticFiles();
 
+// Configure the HTTP request pipeline.
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers(); 
+app.MapControllers();
 app.Run();

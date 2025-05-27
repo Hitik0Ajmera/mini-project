@@ -20,8 +20,8 @@ namespace InventoryAPI.Services
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, admin.Id.ToString()),
-                new Claim(ClaimTypes.Name, admin.Name),
-                new Claim(ClaimTypes.Email, admin.Email)
+                new Claim(ClaimTypes.Name, admin.Name ?? string.Empty),
+                new Claim(ClaimTypes.Email, admin.Email ?? string.Empty)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));
