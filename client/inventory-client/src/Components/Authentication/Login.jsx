@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../Services/api';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -16,10 +16,10 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8001/api/login', formData);
+      const response = await api.post('/login', formData);
       alert(response.data.message);
     } catch (error) {
-      alert('Login failed: ' + error.response.data.message);
+      alert('Login failed: ' + (error.response?.data?.message || error.message));
     }
   };
 

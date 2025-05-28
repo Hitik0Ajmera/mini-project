@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../Services/api';
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -17,10 +17,10 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8001/api/signup', formData);
+      const response = await api.post('/signup', formData);
       alert(response.data.message);
     } catch (error) {
-      alert('Signup failed: ' + error.response.data.message);
+      alert('Signup failed: ' + (error.response?.data?.message || error.message));
     }
   };
 

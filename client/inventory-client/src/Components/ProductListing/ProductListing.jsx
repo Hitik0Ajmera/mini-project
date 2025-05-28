@@ -1,33 +1,48 @@
-import React, { useState } from 'react';
-
-const initialProducts = [
-  { id: 1, name: 'Product 1', price: '$20', image: 'https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', stock: 10 },
-  { id: 2, name: 'Product 2', price: '$30', image: 'https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', stock: 15 },
-  { id: 3, name: 'Product 3', price: '$40', image: 'https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', stock: 8 },
-  { id: 4, name: 'Product 4', price: '$25', image: 'https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', stock: 20 },
-  { id: 5, name: 'Product 5', price: '$50', image: 'https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', stock: 5 },
-  { id: 6, name: 'Product 6', price: '$35', image: 'https://images.unsplash.com/photo-1605142859862-978be7eba909?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', stock: 12 },
-];
+import React, { useState, useEffect } from 'react';
+import api from '../../Services/api';
 
 function ProductListing() {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
 
-  const incrementStock = (id) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id ? { ...product, stock: product.stock + 1 } : product
-      )
-    );
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get('/products');
+        setProducts(response.data);
+      } catch (error) {
+        alert('Failed to fetch products: ' + (error.response?.data?.message || error.message));
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const incrementStock = async (id) => {
+    try {
+      await api.patch(`/products/${id}/increment`);
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === id ? { ...product, stock: product.stock + 1 } : product
+        )
+      );
+    } catch (error) {
+      alert('Failed to increment stock: ' + (error.response?.data?.message || error.message));
+    }
   };
 
-  const decrementStock = (id) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id && product.stock > 0
-          ? { ...product, stock: product.stock - 1 }
-          : product
-      )
-    );
+  const decrementStock = async (id) => {
+    try {
+      await api.patch(`/products/${id}/decrement`);
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === id && product.stock > 0
+            ? { ...product, stock: product.stock - 1 }
+            : product
+        )
+      );
+    } catch (error) {
+      alert('Failed to decrement stock: ' + (error.response?.data?.message || error.message));
+    }
   };
 
   return (

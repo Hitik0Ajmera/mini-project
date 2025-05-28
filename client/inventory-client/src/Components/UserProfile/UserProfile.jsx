@@ -1,18 +1,28 @@
 // contact,email,Name,phone number,address,profile photo. i want ta admin profile page that display these informations coming from my backend
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../Services/api';
 
 function UserProfile() {
-  // Hardcoded profile data for display
-  const profile = {
-    profilePhoto: 'https://via.placeholder.com/150',
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    phone: '+1 234 567 890',
-    address: '123 Main Street, Springfield, USA',
-  };
-
+  const [profile, setProfile] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/profile');
+        setProfile(response.data);
+      } catch (error) {
+        alert('Failed to fetch profile: ' + (error.response?.data?.message || error.message));
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (!profile) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
