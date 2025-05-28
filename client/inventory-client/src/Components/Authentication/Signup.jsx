@@ -21,7 +21,10 @@ function Signup() {
     e.preventDefault();
     try {
       const response = await api.post('/auth/register', formData);
-      alert(response.data.message);
+      if (response.status === 200) {
+        alert('Signup successful! Please login.');
+      }
+      // alert(response.data.message);
     } catch (error) {
       alert('Signup failed: ' + (error.response?.data?.message || error.message));
     }
