@@ -46,7 +46,7 @@ const Register = () => {
         );
         navigate('/login');
         
-        alert(response.data.Message); // Show success message
+        // alert(response.data.Message); // Show success message
         // Redirect to login page or dashboard
 
       } catch (error) {
