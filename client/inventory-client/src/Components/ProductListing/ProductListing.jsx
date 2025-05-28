@@ -1,49 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../Services/api';
+import React, { useEffect, useState } from "react";
+import api from "../../Services/api";
 
-function ProductListing() {
+const ProductListing = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await api.get('/product');
+        const response = await api.get("/product");
+        console.log("Fetched products:", response.data);
+        
         setProducts(response.data);
       } catch (error) {
-        alert('Failed to fetch products: ' + (error.response?.data?.message || error.message));
+        console.error("Error fetching products:", error);
       }
     };
 
     fetchProducts();
   }, []);
-
-  const incrementStock = async (id) => {
-    try {
-      await api.patch(`/products/${id}/increment`);
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === id ? { ...product, stock: product.stock + 1 } : product
-        )
-      );
-    } catch (error) {
-      alert('Failed to increment stock: ' + (error.response?.data?.message || error.message));
-    }
-  };
-
-  const decrementStock = async (id) => {
-    try {
-      await api.patch(`/products/${id}/decrement`);
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === id && product.stock > 0
-            ? { ...product, stock: product.stock - 1 }
-            : product
-        )
-      );
-    } catch (error) {
-      alert('Failed to decrement stock: ' + (error.response?.data?.message || error.message));
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -83,6 +57,6 @@ function ProductListing() {
       </div>
     </div>
   );
-}
+};
 
 export default ProductListing;
