@@ -3,8 +3,16 @@ using InventoryAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DotNetEnv; // ✅ Add this
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ✅ Load environment variables from .env
+Env.Load();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+
+// ✅ Set the application URL from env port
+builder.WebHost.UseUrls($"http://localhost:{port}");
 
 // MongoDB Context and Services
 builder.Services.AddSingleton<MongoDBContext>();
@@ -17,7 +25,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", builder =>
     {
-        builder.WithOrigins("http://localhost:5173") // Update with your React app URL
+        builder.WithOrigins("http://localhost:5173") // React frontend
                .AllowAnyMethod()
                .AllowAnyHeader()
                .AllowCredentials();
