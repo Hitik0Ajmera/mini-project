@@ -5,12 +5,13 @@ import {
   Route,
   useLocation,
 } from "react-router-dom";
-import Signup from "./Components/Authentication/Signup";
-import Login from "./Components/Authentication/Login";
+// import Signup from "./Components/Authentication/Signup";
 import UserProfile from "./Components/UserProfile/UserProfile";
 import ProductListing from "./Components/ProductListing/ProductListing";
 import Header from "./Components/Header/Header";
 import ProtectedRoute from "./Components/ProtectedRoutes/ProtectedRoute";
+import Register from "./components/Authentication/Register";
+import Login from "./components/Authentication/Login";
 
 
 function App() {
@@ -24,7 +25,7 @@ function App() {
       {/* Conditionally render the Header */}
       {!hideHeaderRoutes.includes(location.pathname) && <Header />}
       <Routes>
-        <Route path="/" element={<Signup />} />
+        <Route path="/" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/profile"
