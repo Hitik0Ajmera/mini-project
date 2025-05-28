@@ -2,10 +2,10 @@ using InventoryAPI.Data;
 using InventoryAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using System.IdentityModel.Tokens.Jwt;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,14 +21,14 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", builder =>
     {
-        builder.WithOrigins("http://localhost:3000")
+        builder.WithOrigins("http://localhost:5174")
                .AllowAnyMethod()
                .AllowAnyHeader()
-               .AllowCredentials();
+               .AllowCredentials(); // Required for cookies
     });
 });
 
-// Add JWT Authentication
+// Add Cookie Policy
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -47,8 +47,14 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new ArgumentNullException("JWT key is missing.")))
     };
 
+    // Read token from cookie instead of Authorization header
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            context.Token = context.Request.Cookies["jwt"];
+            return Task.CompletedTask;
+        },
         OnTokenValidated = async context =>
         {
             var dbContext = context.HttpContext.RequestServices.GetRequiredService<MongoDBContext>();
@@ -67,7 +73,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Add Swagger with JWT support and XML comments
+// Add Swagger with JWT support (still useful for manual testing)
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -82,12 +88,10 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // Enable XML comments for better documentation
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 
-    // Add JWT Authentication to Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
