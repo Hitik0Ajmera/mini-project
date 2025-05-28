@@ -21,9 +21,9 @@ function Login() {
         try {
             const response = await api.post('/auth/login', formData);
             setIsLoggedIn(true);
-            if(response.status === 200) {
-                alert('Login successful!');
-            }
+            // if(response.status === 200) {
+            //     alert('Login successful!');
+            // }
             navigate('/products'); // Redirect to /products
         } catch (error) {
             alert('Login failed: ' + (error.response?.data?.message || error.message));

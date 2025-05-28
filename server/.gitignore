@@ -1,5 +1,2 @@
-InventoryAPI/obj/
-InventoryAPI/bin/
-InventoryAPI/bin/Debug/net9.0/InventoryAPI.dll
-InventoryAPI/bin/Debug/net9.0/InventoryAPI.pdb
-InventoryAPI/bin/Debug/net9.0/InventoryAPI.exe
+obj/
+bin/
