@@ -4,9 +4,12 @@ import api from '../../Services/api';
 
 function Signup() {
   const [formData, setFormData] = useState({
-    username: '',
-    emailId: '',
+    name: '',
+    email: '',
     password: '',
+    phone: '',
+    address: '',
+    photoUrl: '',
   });
 
   const handleChange = (e) => {
@@ -31,18 +34,18 @@ function Signup() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
+            name="name"
+            placeholder="Name"
+            value={formData.name}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
           <input
-            type="text"
-            name="emailId"
-            placeholder="emailId"
-            value={formData.emailId}
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
@@ -55,6 +58,32 @@ function Signup() {
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
+          />
+          <input
+            type="text"
+            name="phone"
+            placeholder="Phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <input
+            type="text"
+            name="address"
+            placeholder="Address"
+            value={formData.address}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <input
+            type="text"
+            name="photoUrl"
+            placeholder="Photo URL"
+            value={formData.photoUrl}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"

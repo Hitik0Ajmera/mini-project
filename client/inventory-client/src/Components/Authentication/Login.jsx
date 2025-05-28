@@ -6,7 +6,7 @@ import { AuthContext } from '../Context/AuthContext';
 function Login() {
     const {setIsLoggedIn } = useContext(AuthContext)
   const [formData, setFormData] = useState({
-    emailId: '',
+    email: '', // Updated field name
     password: '',
   });
 
@@ -33,9 +33,9 @@ function Login() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
-            name="emailId"
+            name="email"
             placeholder="emailId"
-            value={formData.emailId}
+            value={formData.email}
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required

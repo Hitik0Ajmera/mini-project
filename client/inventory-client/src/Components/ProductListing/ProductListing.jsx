@@ -57,7 +57,10 @@ function ProductListing() {
               className="w-full h-48 object-cover rounded-lg mb-4"
             />
             <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
-            <p className="text-gray-600">{product.price}</p>
+            <p className="text-gray-600">{product.description}</p>
+            <p className="text-gray-800 mt-2">
+              <span className="font-semibold">Final Price:</span> {product.finalPrice}
+            </p>
             <p className="text-gray-800 mt-2">
               <span className="font-semibold">Stock:</span> {product.stock}
             </p>
