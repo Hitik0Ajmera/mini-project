@@ -10,7 +10,8 @@ import Login from "./Components/Authentication/Login";
 import UserProfile from "./Components/UserProfile/UserProfile";
 import ProductListing from "./Components/ProductListing/ProductListing";
 import Header from "./Components/Header/Header";
-import ProtectedRoute from "./Components/ProtectedRoute";
+import ProtectedRoute from "./Components/ProtectedRoutes/ProtectedRoute";
+
 
 function App() {
   const location = useLocation();
