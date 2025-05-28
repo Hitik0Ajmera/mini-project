@@ -2,8 +2,10 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import React from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -42,8 +44,11 @@ const Register = () => {
           "http://localhost:5272/api/Auth/register",
           values
         );
+        navigate('/login');
+        
         alert(response.data.Message); // Show success message
         // Redirect to login page or dashboard
+
       } catch (error) {
         if (error.response && error.response.data.Errors) {
           setErrors({ submit: error.response.data.Errors.join(", ") });
