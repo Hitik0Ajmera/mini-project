@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../Services/api';
 import { AuthContext } from '../Context/AuthContext';
 
 function Login() {
     const { setIsLoggedIn } = useContext(AuthContext);
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -19,14 +19,13 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await api.post('/auth/login', formData);
+            const response = await api.post('/auth/login', formData, {
+                withCredentials: true // Include cookies in the request
+            });
             setIsLoggedIn(true);
-            // if(response.status === 200) {
-            //     alert('Login successful!');
-            // }
             navigate('/products'); // Redirect to /products
         } catch (error) {
-            alert('Login failed: ' + (error.response?.data?.message || error.message));
+            alert('Login failed: ' + (error.response?.data?.Errors?.join(', ') || error.message));
         }
     };
 
@@ -36,9 +35,9 @@ function Login() {
                 <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
-                        type="text"
+                        type="email" // Changed to type="email" for better validation
                         name="email"
-                        placeholder="emailId"
+                        placeholder="Email"
                         value={formData.email}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

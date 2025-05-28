@@ -26,19 +26,11 @@ namespace InventoryAPI.Controllers
             _logger = logger;
         }
 
-        /// <summary>
-        /// Registers a new admin user.
-        /// </summary>
-        /// <param name="dto">The registration details.</param>
-        /// <returns>Success message or validation errors.</returns>
-        /// <response code="200">Admin registered successfully.</response>
-        /// <response code="400">Validation errors or email already in use.</response>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             _logger.LogInformation("Register attempt for email: {Email}", dto.Email);
 
-            // Validate model using data annotations
             var validationResults = new List<ValidationResult>();
             var validationContext = new ValidationContext(dto);
             bool isValid = Validator.TryValidateObject(dto, validationContext, validationResults, true);
@@ -50,7 +42,6 @@ namespace InventoryAPI.Controllers
                 errors.AddRange(validationResults.Select(r => r.ErrorMessage!));
             }
 
-            // Custom password complexity validation
             if (!string.IsNullOrEmpty(dto.Password))
             {
                 if (!Regex.IsMatch(dto.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"))
@@ -59,7 +50,6 @@ namespace InventoryAPI.Controllers
                 }
             }
 
-            // Check email uniqueness
             var existingAdmin = await _context.Admins.Find(a => a.Email == dto.Email).FirstOrDefaultAsync();
             if (existingAdmin != null)
             {
@@ -87,13 +77,6 @@ namespace InventoryAPI.Controllers
             return Ok(new { Message = "Registered successfully" });
         }
 
-        /// <summary>
-        /// Authenticates an admin and returns a JWT token.
-        /// </summary>
-        /// <param name="dto">The login credentials.</param>
-        /// <returns>JWT token or error message.</returns>
-        /// <response code="200">Login successful, returns JWT token.</response>
-        /// <response code="401">Invalid credentials.</response>
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
@@ -114,20 +97,30 @@ namespace InventoryAPI.Controllers
 
             var token = _jwt.GenerateToken(admin);
             _logger.LogInformation("Login successful for email: {Email}", dto.Email);
-            return Ok(new { Token = token });
+
+            // Set the token in an HTTP-only cookie
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true, // Prevents JavaScript access
+                Secure = true,   // Requires HTTPS (set to false in development if not using HTTPS)
+                SameSite = SameSiteMode.Strict, // Prevents CSRF
+                Expires = DateTime.UtcNow.AddHours(2) // Match token expiration
+            });
+
+            return Ok(new { Message = "Login successful" });
         }
 
-        /// <summary>
-        /// Logs out an admin and blacklists the JWT token.
-        /// </summary>
-        /// <returns>Success message or error.</returns>
-        /// <response code="200">Logged out successfully.</response>
-        /// <response code="400">Invalid token.</response>
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            var token = Request.Cookies["jwt"];
+            if (string.IsNullOrEmpty(token))
+            {
+                _logger.LogWarning("Logout failed: No token found in cookie.");
+                return BadRequest(new { Errors = new[] { "No token found." } });
+            }
+
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
             var jti = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
@@ -147,6 +140,15 @@ namespace InventoryAPI.Controllers
 
             await _context.TokenBlacklist.InsertOneAsync(blacklistedToken);
             _logger.LogInformation("Token blacklisted successfully for admin ID {AdminId}.", User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            // Clear the cookie
+            Response.Cookies.Delete("jwt", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+
             return Ok(new { Message = "Logged out successfully." });
         }
     }
