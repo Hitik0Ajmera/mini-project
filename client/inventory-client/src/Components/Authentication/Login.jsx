@@ -18,7 +18,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/login', formData);
+      const response = await api.post('/auth/login', formData);
       setIsLoggedIn(true);
       alert(response.data.message);
     } catch (error) {

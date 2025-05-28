@@ -20,7 +20,7 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/signup', formData);
+      const response = await api.post('/auth/register', formData);
       alert(response.data.message);
     } catch (error) {
       alert('Signup failed: ' + (error.response?.data?.message || error.message));

@@ -10,7 +10,7 @@ function UserProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await api.get('/profile');
+        const response = await api.get('/admin/profile');
         setProfile(response.data);
       } catch (error) {
         alert('Failed to fetch profile: ' + (error.response?.data?.message || error.message));
