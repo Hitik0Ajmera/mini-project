@@ -35,12 +35,12 @@ namespace InventoryAPI.Controllers
 
             var admin = new Admin
             {
-                Name = dto.Name,
-                Email = dto.Email,
+                Name = dto.Name ?? string.Empty,
+                Email = dto.Email ?? string.Empty,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Phone = dto.Phone,
-                Address = dto.Address,
-                PhotoUrl = dto.PhotoUrl
+                Phone = dto.Phone ?? string.Empty,
+                Address = dto.Address ?? string.Empty,
+                PhotoUrl = dto.PhotoUrl ?? string.Empty
             };
 
             await _context.Admins.InsertOneAsync(admin);
