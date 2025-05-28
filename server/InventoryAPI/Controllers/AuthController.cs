@@ -1,13 +1,12 @@
 using InventoryAPI.Data;
 using InventoryAPI.Models;
 using InventoryAPI.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
-using System.Text.RegularExpressions;
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.RegularExpressions;
 using System.Security.Claims;
 
 namespace InventoryAPI.Controllers
@@ -27,6 +26,13 @@ namespace InventoryAPI.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Registers a new admin user.
+        /// </summary>
+        /// <param name="dto">The registration details.</param>
+        /// <returns>Success message or validation errors.</returns>
+        /// <response code="200">Admin registered successfully.</response>
+        /// <response code="400">Validation errors or email already in use.</response>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
@@ -81,6 +87,13 @@ namespace InventoryAPI.Controllers
             return Ok(new { Message = "Registered successfully" });
         }
 
+        /// <summary>
+        /// Authenticates an admin and returns a JWT token.
+        /// </summary>
+        /// <param name="dto">The login credentials.</param>
+        /// <returns>JWT token or error message.</returns>
+        /// <response code="200">Login successful, returns JWT token.</response>
+        /// <response code="401">Invalid credentials.</response>
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
@@ -104,8 +117,14 @@ namespace InventoryAPI.Controllers
             return Ok(new { Token = token });
         }
 
-        [HttpPost("logout")]
+        /// <summary>
+        /// Logs out an admin and blacklists the JWT token.
+        /// </summary>
+        /// <returns>Success message or error.</returns>
+        /// <response code="200">Logged out successfully.</response>
+        /// <response code="400">Invalid token.</response>
         [Authorize]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
