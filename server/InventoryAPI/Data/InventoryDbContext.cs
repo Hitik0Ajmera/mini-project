@@ -1,15 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using InventoryAPI.Models;
+// using Microsoft.EntityFrameworkCore;
+// using InventoryAPI.Models;
 
-namespace InventoryAPI.Data
-{
-    public class InventoryDbContext : DbContext
-    {
-        public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options)
-        {
-        }
+// namespace InventoryAPI.Data
+// {
+//     public class InventoryDbContext : DbContext
+//     {
+//         public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options)
+//         {
+//         }
 
-        public DbSet<Admin> Admins { get; set; }
-        public DbSet<Product> Products { get; set; }
-    }
-}
+//         public DbSet<Admin> Admins { get; set; }
+//         public DbSet<Product> Products { get; set; }
+//     }
+// }

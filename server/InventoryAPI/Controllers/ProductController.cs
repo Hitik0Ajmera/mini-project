@@ -1,99 +1,55 @@
-using InventoryAPI.Data;
-using InventoryAPI.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using InventoryAPI.Models;
+using InventoryAPI.Services;
 
 namespace InventoryAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ProductController : ControllerBase
     {
-        private readonly InventoryDbContext _context;
+        private readonly ProductService _productService;
 
-        public ProductController(InventoryDbContext context)
+        public ProductController(ProductService productService)
         {
-            _context = context;
+            _productService = productService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
-        {
-            var products = await _context.Products.ToListAsync();
-            return Ok(products);
-        }
+        public async Task<ActionResult<List<Product>>> Get() => await _productService.GetAll();
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductById(int id)
+        public async Task<ActionResult<Product>> Get(string id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-                return NotFound("Product not found.");
-            return Ok(product);
+            var product = await _productService.GetById(id);
+            if (product == null) return NotFound();
+            return product;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProduct([FromBody] Product product)
+        public async Task<ActionResult> Post(Product product)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            product.FinalPrice = product.Price - product.Discount;
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+            await _productService.Create(product);
+            return CreatedAtAction(nameof(Get), new { id = product.Id }, product);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product updatedProduct)
+        public async Task<IActionResult> Put(string id, Product product)
         {
-            if (id != updatedProduct.Id)
-                return BadRequest("Product ID mismatch.");
-
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-                return NotFound("Product not found.");
-
-            product.Name = updatedProduct.Name;
-            product.Price = updatedProduct.Price;
-            product.Discount = updatedProduct.Discount;
-            product.FinalPrice = updatedProduct.Price - updatedProduct.Discount;
-            product.Stock = updatedProduct.Stock;
-            product.Description = updatedProduct.Description;
-            product.ImageUrl = updatedProduct.ImageUrl;
-            product.Category = updatedProduct.Category;
-
-            await _context.SaveChangesAsync();
+            var existing = await _productService.GetById(id);
+            if (existing == null) return NotFound();
+            product.Id = id;
+            await _productService.Update(id, product);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> Delete(string id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-                return NotFound("Product not found.");
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            var existing = await _productService.GetById(id);
+            if (existing == null) return NotFound();
+            await _productService.Delete(id);
             return NoContent();
-        }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchProducts(string name, string category)
-        {
-            var query = _context.Products.AsQueryable();
-
-            if (!string.IsNullOrEmpty(name))
-                query = query.Where(p => p.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
-
-            if (!string.IsNullOrEmpty(category))
-                query = query.Where(p => p.Category == category);
-
-            var products = await query.ToListAsync();
-            return Ok(products);
         }
     }
 }

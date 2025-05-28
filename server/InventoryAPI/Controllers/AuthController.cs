@@ -2,8 +2,7 @@ using InventoryAPI.Data;
 using InventoryAPI.Models;
 using InventoryAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BCrypt.Net;
+using MongoDB.Driver;
 
 namespace InventoryAPI.Controllers
 {
@@ -11,11 +10,11 @@ namespace InventoryAPI.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly InventoryDbContext _context;
+        private readonly MongoDBContext _context;
         private readonly JwtService _jwt;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(InventoryDbContext context, JwtService jwt, ILogger<AuthController> logger)
+        public AuthController(MongoDBContext context, JwtService jwt, ILogger<AuthController> logger)
         {
             _context = context;
             _jwt = jwt;
@@ -27,7 +26,8 @@ namespace InventoryAPI.Controllers
         {
             _logger.LogInformation("Register attempt for email: {Email}", dto.Email);
 
-            if (await _context.Admins.AnyAsync(a => a.Email == dto.Email))
+            var existingAdmin = await _context.Admins.Find(a => a.Email == dto.Email).FirstOrDefaultAsync();
+            if (existingAdmin != null)
             {
                 _logger.LogWarning("Registration failed: Email {Email} already in use.", dto.Email);
                 return BadRequest("Email already in use.");
@@ -37,15 +37,13 @@ namespace InventoryAPI.Controllers
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password), // Use BCrypt for secure hashing
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Phone = dto.Phone,
                 Address = dto.Address,
                 PhotoUrl = dto.PhotoUrl
             };
 
-            _context.Admins.Add(admin);
-            await _context.SaveChangesAsync();
-
+            await _context.Admins.InsertOneAsync(admin);
             _logger.LogInformation("Admin registered successfully: {Email}", dto.Email);
             return Ok("Registered successfully");
         }
@@ -55,7 +53,7 @@ namespace InventoryAPI.Controllers
         {
             _logger.LogInformation("Login attempt for email: {Email}", dto.Email);
 
-            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.Email == dto.Email);
+            var admin = await _context.Admins.Find(a => a.Email == dto.Email).FirstOrDefaultAsync();
             if (admin == null)
             {
                 _logger.LogWarning("Login failed: Admin with email {Email} not found.", dto.Email);

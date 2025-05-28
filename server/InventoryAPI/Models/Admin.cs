@@ -1,18 +1,30 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace InventoryAPI.Models
 {
     public class Admin
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Email { get; set; }
-        public string? PasswordHash { get; set; }
-        public string? Phone { get; set; }
-        public string? Address { get; set; }
-        public string? PhotoUrl { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+
+        [Required]
+        public string Name { get; set; } = null!;
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = null!;
+
+        [Required]
+        public string PasswordHash { get; set; } = null!;
+
+        [Phone]
+        public string Phone { get; set; } = null!;
+
+        public string Address { get; set; } = null!;
+
+        public string PhotoUrl { get; set; } = null!;
     }
 }
