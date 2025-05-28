@@ -24,5 +24,8 @@ namespace InventoryAPI.Data
 
         public IMongoCollection<Category> Categories =>
             _database.GetCollection<Category>("Categories");
+
+        public IMongoCollection<TokenBlacklist> TokenBlacklist =>
+            _database.GetCollection<TokenBlacklist>("TokenBlacklist");
     }
 }
