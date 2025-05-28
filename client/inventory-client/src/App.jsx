@@ -1,16 +1,22 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Signup from './Components/Authentication/Signup';
-import Login from './Components/Authentication/Login';
-import UserProfile from './Components/UserProfile/UserProfile';
-import ProductListing from './Components/ProductListing/ProductListing';
-import Header from './Components/Header/Header';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import Signup from "./Components/Authentication/Signup";
+import Login from "./Components/Authentication/Login";
+import UserProfile from "./Components/UserProfile/UserProfile";
+import ProductListing from "./Components/ProductListing/ProductListing";
+import Header from "./Components/Header/Header";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function App() {
   const location = useLocation();
 
   // Define routes where the Header should not appear
-  const hideHeaderRoutes = ['/', '/login'];
+  const hideHeaderRoutes = ["/", "/login"];
 
   return (
     <>
@@ -19,8 +25,22 @@ function App() {
       <Routes>
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/products" element={<ProductListing />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products"
+          element={
+            <ProtectedRoute>
+              <ProductListing />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

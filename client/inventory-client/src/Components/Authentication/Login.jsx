@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../Services/api';
+import { AuthContext } from '../Context/AuthContext';
 
 function Login() {
+    const {setIsLoggedIn } = useContext(AuthContext)
   const [formData, setFormData] = useState({
     emailId: '',
     password: '',
@@ -17,6 +19,7 @@ function Login() {
     e.preventDefault();
     try {
       const response = await api.post('/login', formData);
+      setIsLoggedIn(true);
       alert(response.data.message);
     } catch (error) {
       alert('Login failed: ' + (error.response?.data?.message || error.message));
