@@ -1,11 +1,20 @@
+<<<<<<< HEAD
 ﻿{
+=======
+{
+  
+>>>>>>> 94b9f80f4bbbdc8f3ac99b08ce44556847eac4e3
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
+<<<<<<< HEAD
       "applicationUrl": "http://localhost:5000",
+=======
+      "applicationUrl": "http://localhost:5272",
+>>>>>>> 94b9f80f4bbbdc8f3ac99b08ce44556847eac4e3
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
