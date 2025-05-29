@@ -29,7 +29,7 @@ function UserProfile() {
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full">
         <div className="flex flex-col items-center">
           <img
-            src={profile.profilePhoto}
+            src={profile.photoUrl}
             alt="Profile"
             className="w-32 h-32  shadow-md mb-4"
           />
@@ -48,7 +48,7 @@ function UserProfile() {
           </div>
         </div>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/products')}
           className="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
         >
           Go Back
