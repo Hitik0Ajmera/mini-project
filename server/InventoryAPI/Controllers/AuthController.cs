@@ -110,46 +110,20 @@ namespace InventoryAPI.Controllers
             return Ok(new { Message = "Login successful" });
         }
 
-        [Authorize]
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            var token = Request.Cookies["jwt"];
-            if (string.IsNullOrEmpty(token))
-            {
-                _logger.LogWarning("Logout failed: No token found in cookie.");
-                return BadRequest(new { Errors = new[] { "No token found." } });
-            }
-
-            var handler = new JwtSecurityTokenHandler();
-            var jwtToken = handler.ReadJwtToken(token);
-            var jti = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
-            var expiry = jwtToken.ValidTo;
-
-            if (string.IsNullOrEmpty(jti) || expiry == default)
-            {
-                _logger.LogWarning("Logout failed: Invalid token.");
-                return BadRequest(new { Errors = new[] { "Invalid token." } });
-            }
-
-            var blacklistedToken = new TokenBlacklist
-            {
-                TokenId = jti,
-                ExpiryDate = expiry
-            };
-
-            await _context.TokenBlacklist.InsertOneAsync(blacklistedToken);
-            _logger.LogInformation("Token blacklisted successfully for admin ID {AdminId}.", User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
-            // Clear the cookie
-            Response.Cookies.Delete("jwt", new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
-
-            return Ok(new { Message = "Logged out successfully." });
-        }
+public IActionResult Logout()
+{
+    // Blacklist the token if using a blacklist mechanism (optional)
+    // Clear the JWT cookie
+    Response.Cookies.Append("jwt", "", new CookieOptions
+    {
+        HttpOnly = true, // Must match the original cookie settings
+        Secure = true,   // Must match the original (use false in development if not using HTTPS)
+        SameSite = SameSiteMode.Strict, // Must match the original
+        Expires = DateTime.UtcNow.AddDays(-1), // Expire the cookie immediately
+        Path = "/" // Ensure the path matches the original cookie
+    });
+    return Ok(new { message = "Logged out successfully" });
+}
     }
 }
