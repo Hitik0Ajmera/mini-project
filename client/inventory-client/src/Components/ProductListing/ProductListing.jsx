@@ -28,12 +28,26 @@ const ProductListing = () => {
     };
   }, []);
 
-  const incrementStock = (id) => {
-    console.log(`Increment stock for product ${id}`);
+  const incrementStock = async (id) => {
+    const product = products.find((p) => p.id === id || p._id === id);
+    if (!product) return;
+    try {
+      await api.put(`/product/${id}`, { ...product, stock: product.stock + 1 });
+      fetchProducts();
+    } catch (error) {
+      alert('Failed to increment stock: ' + (error.response?.data?.Errors?.join(', ') || error.message));
+    }
   };
 
-  const decrementStock = (id) => {
-    console.log(`Decrement stock for product ${id}`);
+  const decrementStock = async (id) => {
+    const product = products.find((p) => p.id === id || p._id === id);
+    if (!product || product.stock <= 0) return;
+    try {
+      await api.put(`/product/${id}`, { ...product, stock: product.stock - 1 });
+      fetchProducts();
+    } catch (error) {
+      alert('Failed to decrement stock: ' + (error.response?.data?.Errors?.join(', ') || error.message));
+    }
   };
 
   return (

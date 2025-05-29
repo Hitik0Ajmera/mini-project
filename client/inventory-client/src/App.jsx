@@ -13,7 +13,8 @@ import ProtectedRoute from "./Components/ProtectedRoutes/ProtectedRoute";
 import Register from "./components/Authentication/Register";
 // import Login from "./components/Authentication/Login";
 import UserProfile from "./components/UserProfile/UserProfile";
-import Login from "./Components/Authentication/Login";
+import Login from "./components/Authentication/Login";
+
 
 
 function App() {
