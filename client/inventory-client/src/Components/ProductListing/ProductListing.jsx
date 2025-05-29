@@ -8,8 +8,6 @@ const ProductListing = () => {
     const fetchProducts = async () => {
       try {
         const response = await api.get("/product");
-        console.log("Fetched products:", response.data);
-        
         setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -26,7 +24,7 @@ const ProductListing = () => {
         {products.map((product) => (
           <div key={product.id} className="bg-white rounded-lg shadow-md p-4">
             <img
-              src={product.image}
+              src={product.imageUrl}
               alt={product.name}
               className="w-full h-48 object-cover rounded-lg mb-4"
             />
@@ -38,20 +36,6 @@ const ProductListing = () => {
             <p className="text-gray-800 mt-2">
               <span className="font-semibold">Stock:</span> {product.stock}
             </p>
-            <div className="flex justify-between items-center mt-4">
-              <button
-                onClick={() => decrementStock(product.id)}
-                className="bg-blue-400 text-white py-1 px-3 rounded-lg hover:bg-blue-500 transition"
-              >
-                -
-              </button>
-              <button
-                onClick={() => incrementStock(product.id)}
-                className="bg-blue-400 text-white py-1 px-3 rounded-lg hover:bg-blue-500 transition"
-              >
-                +
-              </button>
-            </div>
           </div>
         ))}
       </div>
